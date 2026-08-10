@@ -1,0 +1,29 @@
+{
+  "name": "noir",
+  "version": "1.0.0",
+  "description": "vendemos cookies muymuymuy ricas",
+  "main": "admin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urzurioliver/Noir.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/urzurioliver/Noir/issues"
+  },
+  "homepage": "https://github.com/urzurioliver/Noir#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "openai": "^7.4.0",
+    "sqlite3": "^6.0.1"
+  }
+}

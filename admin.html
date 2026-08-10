@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MESS - Panel Admin</title>
+</head>
+<body>
+    <h1>Panel Privado de Administración - MESS</h1>
+
+    <div id="loginSection">
+        <h3>Iniciar Sesión</h3>
+        <input type="password" id="adminPass" placeholder="Contraseña">
+        <button onclick="loginAdmin()">Ingresar</button>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+        <button onclick="cargarPedidos()">Refrescar Pedidos</button>
+        <button onclick="logout()">Cerrar Sesión</button>
+        <hr>
+        <h2>Lista de Pedidos</h2>
+        <div id="pedidosList">Cargando...</div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

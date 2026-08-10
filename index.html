@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MESS - Tienda de Cookies</title>
+</head>
+<body>
+    <h1>MESS - Compra de Cookies</h1>
+
+    <section>
+        <h2>Menú</h2>
+        <div id="menu-cookies">Cargando menú...</div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Realizar Pedido</h2>
+        <form id="orderForm" enctype="multipart/form-data">
+            <div>
+                <label>Nombre y Apellido:</label><br>
+                <input type="text" id="nombreApellido" required placeholder="Ej: Maria Perez">
+            </div><br>
+
+            <div>
+                <label>Curso:</label><br>
+                <input type="text" id="curso" required placeholder="Ej: 5º B">
+            </div><br>
+
+            <div>
+                <label>¿Cómo recibes el pedido?:</label><br>
+                <select id="metodoEntrega" required>
+                    <option value="colegio">En el colegio</option>
+                    <option value="afuera">Afuera del colegio</option>
+                </select>
+            </div><br>
+
+            <div>
+                <label>Método de Pago:</label><br>
+                <select id="metodoPago" required onchange="toggleComprobante(this.value)">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="mercadopago">Mercado Pago</option>
+                </select>
+            </div><br>
+
+            <div id="comprobanteContainer" style="display:none;">
+                <label>Adjuntar Comprobante (Mercado Pago):</label><br>
+                <input type="file" id="comprobante" accept="image/*">
+            </div><br>
+
+            <h3>Total a pagar: $<span id="totalText">0</span></h3>
+
+            <button type="submit">Confirmar y Enviar Pedido</button>
+        </form>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
