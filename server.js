@@ -2,36 +2,43 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const OpenAI = require('openai');
-const db = require('./database');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 const JWT_SECRET = process.env.JWT_SECRET || "mess_secret_key";
 
+// Inicializar OpenAI y Supabase
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Configurar Multer para guardar la imagen en MEMORIA RAM (ideal para Vercel y Supabase Storage)
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración de almacenamiento para comprobantes
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = './uploads';
-        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `comp_${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
-const upload = multer({ storage });
+// Función auxiliar para subir la foto a Supabase Storage
+async function subirComprobante(file) {
+  if (!file) return null;
+  const fileName = `${Date.now()}_${file.originalname}`;
+  const { data, error } = await supabase.storage
+    .from('comprobantes')
+    .upload(fileName, file.buffer, { contentType: file.mimetype });
+
+  if (error) throw error;
+
+  const { data: publicUrlData } = supabase.storage
+    .from('comprobantes')
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
+}
 
 // Middleware de verificación para Admin
 function autenticarAdmin(req, res, next) {
@@ -46,15 +53,14 @@ function autenticarAdmin(req, res, next) {
     });
 }
 
-// Función de verificación de comprobante por IA (GPT-4 Vision)
-async function verificarComprobanteIA(filePath, montoEsperado) {
+// Función de verificación de comprobante por IA (GPT-4 Vision usando el buffer en memoria)
+async function verificarComprobanteIA(fileBuffer, montoEsperado) {
     try {
         if (!process.env.OPENAI_API_KEY) {
             return { verificado: 0, detalle: "API Key de OpenAI no configurada." };
         }
 
-        const imageBuffer = fs.readFileSync(filePath);
-        const base64Image = imageBuffer.toString('base64');
+        const base64Image = fileBuffer.toString('base64');
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
@@ -69,7 +75,7 @@ async function verificarComprobanteIA(filePath, montoEsperado) {
                             Verifica:
                             1. ¿Es un comprobante de Mercado Pago legítimo?
                             2. ¿El monto pagado coincide con el esperado?
-                            3. ¿La fecha es del día de hoy?
+                            3. ¿La fecha es del día de hoy o reciente?
                             Responde estrictamente en formato JSON con la siguiente estructura:
                             {"valido": true/false, "motivo": "explicacion corta"}`
                         },
@@ -96,56 +102,56 @@ async function verificarComprobanteIA(filePath, montoEsperado) {
 
 // --- RUTAS PÚBLICAS ---
 
-// Obtener menú de cookies
-app.get('/api/cookies', (req, res) => {
-    db.all("SELECT * FROM cookies WHERE disponible = 1", [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
+// Obtener menú de cookies desde Supabase
+app.get('/api/cookies', async (req, res) => {
+    try {
+        const { data: cookies, error } = await supabase
+            .from('cookies')
+            .select('*')
+            .eq('disponible', true);
+
+        if (error) throw error;
+        res.json(cookies);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Crear un nuevo pedido
 app.post('/api/pedidos', upload.single('comprobante'), async (req, res) => {
-    try {
-        const { cliente_nombre, curso, metodo_entrega, metodo_pago, total, items } = req.body;
-        const parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
-        const comprobanteUrl = req.file ? `/uploads/${req.file.filename}` : null;
+  try {
+    const { nombre, curso, metodoEntrega, items, total, metodoPago } = req.body;
 
-        let verificadoIa = 0;
-        let iaDetalle = "Efectivo - No requiere verificación de comprobante";
+    let comprobanteUrl = null;
+    let verificacionIa = null;
 
-        if (metodo_pago === 'mercadopago' && req.file) {
-            const analisis = await verificarComprobanteIA(req.file.path, total);
-            verificadoIa = analisis.verificado;
-            iaDetalle = analisis.detalle;
-        }
-
-        db.run(
-            `INSERT INTO pedidos (cliente_nombre, curso, metodo_entrega, total, metodo_pago, comprobante_url, verificado_ia, ia_analisis_detalle) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [cliente_nombre, curso, metodo_entrega, total, metodo_pago, comprobanteUrl, verificadoIa, iaDetalle],
-            function (err) {
-                if (err) return res.status(500).json({ error: err.message });
-
-                const pedidoId = this.lastID;
-                const stmt = db.prepare("INSERT INTO pedido_items (pedido_id, cookie_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)");
-
-                parsedItems.forEach(item => {
-                    stmt.run(pedidoId, item.cookie_id, item.cantidad, item.precio_unitario);
-                });
-                stmt.finalize();
-
-                res.status(201).json({
-                    mensaje: "Pedido registrado correctamente",
-                    pedido_id: pedidoId,
-                    verificado_ia: verificadoIa,
-                    ia_detalle: iaDetalle
-                });
-            }
-        );
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    // 1. Si enviaron comprobante, subir a Supabase y analizar con IA
+    if (req.file) {
+      comprobanteUrl = await subirComprobante(req.file);
+      verificacionIa = await verificarComprobanteIA(req.file.buffer, total);
     }
+
+    // 2. Guardar el pedido en Supabase
+    const { data, error } = await supabase
+      .from('pedidos')
+      .insert([{
+        nombre,
+        curso,
+        metodo_entrega: metodoEntrega,
+        items: typeof items === 'string' ? JSON.parse(items) : items,
+        total: Number(total),
+        metodo_pago: metodoPago,
+        comprobante_url: comprobanteUrl,
+        verificacion_ia: verificacionIa
+      }]);
+
+    if (error) throw error;
+
+    res.json({ ok: true, mensaje: "Pedido recibido con éxito" });
+  } catch (error) {
+    console.error("Error al procesar pedido:", error);
+    res.status(500).json({ error: "Error al guardar el pedido" });
+  }
 });
 
 // --- RUTAS DE ADMINISTRACIÓN ---
@@ -161,33 +167,36 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 // Obtener todos los pedidos
-app.get('/api/admin/pedidos', autenticarAdmin, (req, res) => {
-    const query = `
-        SELECT p.*, 
-               json_group_array(
-                   json_object('cookie', c.nombre, 'cantidad', pi.cantidad, 'precio_unitario', pi.precio_unitario)
-               ) as items
-        FROM pedidos p
-        LEFT JOIN pedido_items pi ON p.id = pi.pedido_id
-        LEFT JOIN cookies c ON pi.cookie_id = c.id
-        GROUP BY p.id
-        ORDER BY p.fecha DESC
-    `;
+app.get('/api/admin/pedidos', autenticarAdmin, async (req, res) => {
+  try {
+    const { data: pedidos, error } = await supabase
+      .from('pedidos')
+      .select('*')
+      .order('fecha', { ascending: false });
 
-    db.all(query, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        const result = rows.map(r => ({ ...r, items: JSON.parse(r.items) }));
-        res.json(result);
-    });
+    if (error) throw error;
+
+    res.json(pedidos);
+  } catch (error) {
+    console.error("Error al obtener pedidos:", error);
+    res.status(500).json({ error: "Error al consultar la base de datos" });
+  }
 });
 
-// Cambiar estado de un pedido
-app.patch('/api/admin/pedidos/:id/estado', autenticarAdmin, (req, res) => {
-    const { estado } = req.body;
-    db.run("UPDATE pedidos SET estado = ? WHERE id = ?", [estado, req.params.id], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
+// Cambiar estado de un pedido en Supabase
+app.patch('/api/admin/pedidos/:id/estado', autenticarAdmin, async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const { error } = await supabase
+            .from('pedidos')
+            .update({ estado })
+            .eq('id', req.params.id);
+
+        if (error) throw error;
         res.json({ mensaje: "Estado actualizado exitosamente" });
-    });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.listen(PORT, () => {
