@@ -57,7 +57,7 @@ async function cargarPedidos() {
     container.innerHTML = pedidos.map(p => `
         <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
             <p><strong>Pedido #${p.id}</strong> - ${p.fecha}</p>
-            <p><strong>Cliente:</strong> ${p.cliente_nombre} | <strong>Curso:</strong> ${p.curso}</p>
+            <p><strong>Cliente:</strong> ${p.nombre} | <strong>Curso:</strong> ${p.curso}</p>
             <p><strong>Entrega:</strong> ${p.metodo_entrega} | <strong>Pago:</strong> ${p.metodo_pago} ($${p.total})</p>
             <p><strong>Estado Actual:</strong> ${p.estado}</p>
             
