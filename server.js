@@ -102,6 +102,14 @@ async function verificarComprobanteIA(fileBuffer, montoEsperado) {
 
 // --- RUTAS PÚBLICAS ---
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // Obtener menú de cookies desde Supabase
 app.get('/api/cookies', async (req, res) => {
     try {
@@ -120,7 +128,21 @@ app.get('/api/cookies', async (req, res) => {
 // Crear un nuevo pedido
 app.post('/api/pedidos', upload.single('comprobante'), async (req, res) => {
   try {
-    const { nombre, curso, metodoEntrega, items, total, metodoPago } = req.body;
+    const {
+      nombre,
+      cliente_nombre,
+      curso,
+      metodoEntrega,
+      metodo_entrega,
+      items,
+      total,
+      metodoPago,
+      metodo_pago
+    } = req.body;
+
+    const nombrePedido = nombre || cliente_nombre;
+    const metodoEntregaPedido = metodoEntrega || metodo_entrega;
+    const metodoPagoPedido = metodoPago || metodo_pago;
 
     let comprobanteUrl = null;
     let verificacionIa = null;
@@ -135,12 +157,12 @@ app.post('/api/pedidos', upload.single('comprobante'), async (req, res) => {
     const { data, error } = await supabase
       .from('pedidos')
       .insert([{
-        nombre,
+        nombre: nombrePedido,
         curso,
-        metodo_entrega: metodoEntrega,
+        metodo_entrega: metodoEntregaPedido,
         items: typeof items === 'string' ? JSON.parse(items) : items,
         total: Number(total),
-        metodo_pago: metodoPago,
+        metodo_pago: metodoPagoPedido,
         comprobante_url: comprobanteUrl,
         verificacion_ia: verificacionIa
       }]);
@@ -199,6 +221,10 @@ app.patch('/api/admin/pedidos/:id/estado', autenticarAdmin, async (req, res) => 
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor MESS ejecutándose en http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Servidor MESS ejecutándose en http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;

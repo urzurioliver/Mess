@@ -58,7 +58,7 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
     }
 
     const formData = new FormData();
-    formData.append('cliente_nombre', document.getElementById('nombreApellido').value);
+    formData.append('nombre', document.getElementById('nombreApellido').value);
     formData.append('curso', document.getElementById('curso').value);
     formData.append('metodo_entrega', document.getElementById('metodoEntrega').value);
     formData.append('metodo_pago', document.getElementById('metodoPago').value);
