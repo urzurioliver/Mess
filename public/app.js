@@ -52,6 +52,7 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
         const item = cookiesDisponibles.find(c => c.id == id);
         items.push({
             cookie_id: parseInt(id),
+            cookie: item.nombre,
             cantidad: carrito[id],
             precio_unitario: item.precio
         });
