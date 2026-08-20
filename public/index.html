@@ -1,59 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>MESS - Tienda de Cookies</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESS Cookies</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>MESS - Compra de Cookies</h1>
 
-    <section>
-        <h2>Menú</h2>
-        <div id="menu-cookies">Cargando menú...</div>
+  <div class="app-viewport">
+    
+    <!-- HEADER -->
+    <header class="header-brand">
+      <h1 class="brand-title">MESS</h1>
+      <p class="brand-subtitle">NUESTRO MENÚ</p>
+    </header>
+
+    <!-- SECCIÓN DE PRODUCTOS -->
+    <main id="menu-section" class="menu-grid">
+      <!-- Las cookies se cargan dinámicamente aquí -->
+    </main>
+
+    <!-- SECCIÓN CARRITO / TICKET -->
+    <section class="ticket-container" id="carrito-section">
+      <div class="ticket-header">
+        <h2 style="font-size: 2rem; color: #444;">MESS</h2>
+        <p>MAKE THINGS MESSY AGAIN</p>
+      </div>
+
+      <div id="ticket-items">
+        <!-- Items seleccionados -->
+      </div>
+
+      <div class="ticket-total">
+        <span>A pagar</span>
+        <span id="total-monto">$0</span>
+      </div>
+
+      <!-- FORMULARIO DE CHECKOUT -->
+      <form id="form-pedido" style="margin-top: 15px;">
+        <input type="text" id="nombre" class="ticket-input" placeholder="Nombre y apellido" required>
+        <input type="text" id="curso" class="ticket-input" placeholder="Curso / Ubicación" required>
+        
+        <select id="metodoEntrega" class="ticket-input" required>
+          <option value="" disabled selected>Cómo recibís el pedido</option>
+          <option value="Retiro en Stand">Retiro en Stand</option>
+          <option value="Entrega en Aula">Entrega en Aula</option>
+        </select>
+
+        <select id="metodoPago" class="ticket-input" required onchange="toggleComprobante(this.value)">
+          <option value="" disabled selected>Medio de pago</option>
+          <option value="Efectivo">Efectivo</option>
+          <option value="Transferencia">Transferencia / Mercado Pago</option>
+        </select>
+
+        <div id="box-comprobante" style="display: none;">
+          <label style="font-size: 0.8rem; font-family: monospace;">Comprobante de pago:</label>
+          <input type="file" id="comprobante" class="ticket-input" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn-primary-action" id="btn-confirmar">Confirmar</button>
+      </form>
     </section>
 
-    <hr>
+    <!-- POPUPS DE NOTIFICACIÓN -->
+    <div id="popup-vacio" class="popup-alert" style="display: none;">
+      <h3>TODAVÍA NO TENÉS COOKIES EN TU CARRITO</h3>
+      <p style="margin-top: 8px; font-size: 0.85rem;">Agregá cookies antes de continuar</p>
+      <button class="btn-popup" onclick="cerrarPopup('popup-vacio')">Volver</button>
+    </div>
 
-    <section>
-        <h2>Realizar Pedido</h2>
-        <form id="orderForm" enctype="multipart/form-data">
-            <div>
-                <label>Nombre y Apellido:</label><br>
-                <input type="text" id="nombreApellido" required placeholder="Ej: Maria Perez">
-            </div><br>
+    <div id="popup-exito" class="popup-alert success" style="display: none;">
+      <h3>TU PAGO FUE PROCESADO EXITOSAMENTE</h3>
+      <p style="margin-top: 8px; font-size: 0.85rem;">Gracias por tu compra.</p>
+      <button class="btn-popup" onclick="cerrarPopup('popup-exito')">Volver</button>
+    </div>
 
-            <div>
-                <label>Curso:</label><br>
-                <input type="text" id="curso" required placeholder="Ej: 5º B">
-            </div><br>
+  </div>
 
-            <div>
-                <label>¿Cómo recibes el pedido?:</label><br>
-                <select id="metodoEntrega" required>
-                    <option value="colegio">En el colegio</option>
-                    <option value="afuera">Afuera del colegio</option>
-                </select>
-            </div><br>
-
-            <div>
-                <label>Método de Pago:</label><br>
-                <select id="metodoPago" required onchange="toggleComprobante(this.value)">
-                    <option value="efectivo">Efectivo</option>
-                    <option value="mercadopago">Mercado Pago</option>
-                </select>
-            </div><br>
-
-            <div id="comprobanteContainer" style="display:none;">
-                <label>Adjuntar Comprobante (Mercado Pago):</label><br>
-                <input type="file" id="comprobante" accept="image/*">
-            </div><br>
-
-            <h3>Total a pagar: $<span id="totalText">0</span></h3>
-
-            <button type="submit">Confirmar y Enviar Pedido</button>
-        </form>
-    </section>
-
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

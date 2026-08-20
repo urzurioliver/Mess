@@ -1,90 +1,134 @@
-let cookiesDisponibles = [];
-const carrito = {};
+let productos = [];
+let carrito = {};
 
+// Cargar menú al iniciar
 document.addEventListener('DOMContentLoaded', async () => {
+  await cargarCookies();
+  document.getElementById('form-pedido').addEventListener('submit', procesarPedido);
+});
+
+async function cargarCookies() {
+  try {
     const res = await fetch('/api/cookies');
-    cookiesDisponibles = await res.json();
-    
-    const container = document.getElementById('menu-cookies');
-    container.innerHTML = cookiesDisponibles.map(c => `
-        <div>
-            <strong>${c.nombre}</strong> - $${c.precio}
-            <input type="number" min="0" value="0" id="cookie-${c.id}" onchange="actualizarCarrito(${c.id}, this.value)">
+    productos = await res.json();
+    renderizarMenu();
+    renderizarCarrito();
+  } catch (err) {
+    console.error("Error al cargar menú:", err);
+  }
+}
+
+function renderizarMenu() {
+  const container = document.getElementById('menu-section');
+  container.innerHTML = '';
+
+  productos.forEach(prod => {
+    const card = document.createElement('div');
+    card.className = 'cookie-card';
+    card.innerHTML = `
+      <div class="cookie-card-body">
+        <img class="cookie-img-circle" src="${prod.imagen || 'https://via.placeholder.com/80'}" alt="${prod.nombre}">
+        <div class="cookie-info">
+          <h3>${prod.nombre}</h3>
+          <p>${prod.descripcion || ''}</p>
+          <div class="cookie-price">$${prod.precio}</div>
         </div>
-    `).join('');
-});
-
-function actualizarCarrito(id, cantidad) {
-    const qty = parseInt(cantidad) || 0;
-    if (qty > 0) {
-        carrito[id] = qty;
-    } else {
-        delete carrito[id];
-    }
-    calcularTotal();
+      </div>
+      <button class="btn-add-cart" onclick="agregarAlCarrito(${prod.id})">Agregar al carrito</button>
+    `;
+    container.appendChild(card);
+  });
 }
 
-function calcularTotal() {
-    let total = 0;
-    for (const id in carrito) {
-        const item = cookiesDisponibles.find(c => c.id == id);
-        if (item) total += item.precio * carrito[id];
-    }
-    document.getElementById('totalText').textContent = total;
-    return total;
+function agregarAlCarrito(id) {
+  if (carrito[id]) {
+    carrito[id].cantidad++;
+  } else {
+    const prod = productos.find(p => p.id === id);
+    carrito[id] = { ...prod, cantidad: 1 };
+  }
+  renderizarCarrito();
 }
 
-function toggleComprobante(metodo) {
-    document.getElementById('comprobanteContainer').style.display = metodo === 'mercadopago' ? 'block' : 'none';
+function cambiarCantidad(id, delta) {
+  if (carrito[id]) {
+    carrito[id].cantidad += delta;
+    if (carrito[id].cantidad <= 0) delete carrito[id];
+  }
+  renderizarCarrito();
 }
 
-document.getElementById('orderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+function renderizarCarrito() {
+  const container = document.getElementById('ticket-items');
+  container.innerHTML = '';
+  let total = 0;
 
-    const total = calcularTotal();
-    if (total <= 0) {
-        alert("Por favor selecciona al menos una cookie.");
-        return;
-    }
+  Object.values(carrito).forEach(item => {
+    total += item.precio * item.cantidad;
+    const row = document.createElement('div');
+    row.className = 'ticket-item';
+    row.innerHTML = `
+      <div>
+        <strong>${item.nombre}</strong><br>
+        <small>${item.cantidad}X $${item.precio}</small>
+      </div>
+      <div class="qty-controls">
+        <button type="button" class="btn-qty" onclick="cambiarCantidad(${item.id}, -1)">-</button>
+        <button type="button" class="btn-qty plus" onclick="cambiarCantidad(${item.id}, 1)">+</button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
 
-    const items = [];
-    for (const id in carrito) {
-        const item = cookiesDisponibles.find(c => c.id == id);
-        items.push({
-            cookie_id: parseInt(id),
-            cookie: item.nombre,
-            cantidad: carrito[id],
-            precio_unitario: item.precio
-        });
-    }
+  document.getElementById('total-monto').innerText = `$${total}`;
+}
 
-    const formData = new FormData();
-    formData.append('nombre', document.getElementById('nombreApellido').value);
-    formData.append('curso', document.getElementById('curso').value);
-    formData.append('metodo_entrega', document.getElementById('metodoEntrega').value);
-    formData.append('metodo_pago', document.getElementById('metodoPago').value);
-    formData.append('total', total);
-    formData.append('items', JSON.stringify(items));
+function toggleComprobante(val) {
+  const box = document.getElementById('box-comprobante');
+  box.style.display = val === 'Transferencia' ? 'block' : 'none';
+}
 
-    if (document.getElementById('metodoPago').value === 'mercadopago') {
-        const fileInput = document.getElementById('comprobante');
-        if (fileInput.files.length === 0) {
-            alert("Debes adjuntar el comprobante para pagos por Mercado Pago.");
-            return;
-        }
-        formData.append('comprobante', fileInput.files[0]);
-    }
+async function procesarPedido(e) {
+  e.preventDefault();
 
-    const res = await fetch('/api/pedidos', {
-        method: 'POST',
-        body: formData
-    });
+  const itemsKeys = Object.keys(carrito);
+  if (itemsKeys.length === 0) {
+    document.getElementById('popup-vacio').style.display = 'block';
+    return;
+  }
 
+  const formData = new FormData();
+  formData.append('nombre', document.getElementById('nombre').value);
+  formData.append('curso', document.getElementById('curso').value);
+  formData.append('metodoEntrega', document.getElementById('metodoEntrega').value);
+  formData.append('metodoPago', document.getElementById('metodoPago').value);
+  
+  const items = Object.values(carrito).map(i => ({ nombre: i.nombre, cantidad: i.cantidad, precio: i.precio }));
+  formData.append('items', JSON.stringify(items));
+  
+  const total = items.reduce((acc, i) => acc + (i.precio * i.cantidad), 0);
+  formData.append('total', total);
+
+  const compInput = document.getElementById('comprobante');
+  if (compInput.files[0]) {
+    formData.append('comprobante', compInput.files[0]);
+  }
+
+  try {
+    const res = await fetch('/api/pedidos', { method: 'POST', body: formData });
     const data = await res.json();
-    if (res.ok) {
-        alert(`¡Pedido realizado con éxito! ID: ${data.pedido_id}\nDetalle IA: ${data.ia_detalle}`);
-        window.location.reload();
-    } else {
-        alert(`Error: ${data.error}`);
+
+    if (data.ok) {
+      carrito = {};
+      renderizarCarrito();
+      document.getElementById('form-pedido').reset();
+      document.getElementById('popup-exito').style.display = 'block';
     }
-});
+  } catch (err) {
+    alert("Ocurrió un error al enviar el pedido");
+  }
+}
+
+function cerrarPopup(id) {
+  document.getElementById(id).style.display = 'none';
+}

@@ -1,0 +1,247 @@
+/* --- VARIABLES Y FUENTES --- */
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fredoka:wght@400;600;700&display=swap');
+
+:root {
+  --bg-yellow: #fde880;
+  --ticket-bg: #efe8d8;
+  --brand-pink: #e61c74;
+  --brand-blue: #1b42cd;
+  --text-dark: #222222;
+  --border-dark: #1e1e1e;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-yellow);
+  font-family: 'Fredoka', sans-serif;
+  color: var(--text-dark);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 10px;
+}
+
+/* --- CONTENEDOR TIPO MÓVIL / CENTRADO EN DESKTOP --- */
+.app-viewport {
+  width: 100%;
+  max-width: 420px;
+  min-height: 90vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- LOGO Y ENCABEZADO --- */
+.header-brand {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.brand-title {
+  font-size: 3rem;
+  color: var(--brand-pink);
+  text-shadow: 2px 2px 0px var(--border-dark);
+  letter-spacing: -1px;
+}
+
+.brand-subtitle {
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* --- TARJETA DE MENU (COOKIE) --- */
+.cookie-card {
+  background-color: var(--ticket-bg);
+  border: 1.5px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+
+.cookie-card-body {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.cookie-img-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #ccc;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-dark);
+}
+
+.cookie-info h3 {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.cookie-info p {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.cookie-price {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* BOTÓN AGREGAR AL CARRITO (PISA EL BORDACITO INFERIOR COMO EN FIGMA) */
+.btn-add-cart {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--brand-blue);
+  color: white;
+  border: 1.5px solid var(--border-dark);
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0px 3px 0px var(--border-dark);
+}
+
+.btn-add-cart:active {
+  transform: translate(-50%, 2px);
+  box-shadow: 0px 1px 0px var(--border-dark);
+}
+
+/* --- ESTILO TICKET (CARRITO Y CHECKOUT) --- */
+.ticket-container {
+  background-color: var(--ticket-bg);
+  border: 1.5px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'Courier Prime', monospace;
+}
+
+.ticket-header {
+  text-align: center;
+  border-bottom: 2px dashed #888;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.ticket-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.qty-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-qty {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--brand-pink);
+  background-color: transparent;
+  color: var(--brand-pink);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-qty.plus {
+  background-color: var(--brand-pink);
+  color: white;
+}
+
+.ticket-total {
+  border-top: 2px dashed #888;
+  padding-top: 15px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* --- FORMULARIOS E INPUTS --- */
+.ticket-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.9rem;
+}
+
+.btn-primary-action {
+  width: 100%;
+  background-color: var(--brand-blue);
+  color: white;
+  border: 1.5px solid var(--border-dark);
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 4px 0px var(--border-dark);
+  margin-top: 10px;
+}
+
+/* --- ALERTAS FLOTANTES (POPUP) --- */
+.popup-alert {
+  position: absolute;
+  top: 30%;
+  left: 5%;
+  width: 90%;
+  background-color: var(--brand-pink);
+  color: white;
+  border: 2px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 4px 6px 0px var(--border-dark);
+  z-index: 100;
+}
+
+.popup-alert.success {
+  background-color: #288448;
+}
+
+.btn-popup {
+  background-color: var(--brand-pink);
+  color: white;
+  border: 1px solid white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* Adaptación para pantallas de escritorio */
+@media (min-width: 768px) {
+  .app-viewport {
+    max-width: 800px;
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
