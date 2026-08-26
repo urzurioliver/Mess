@@ -1,0 +1,334 @@
+/* ==========================================
+   VARIABLES Y ESTILOS GLOBALES
+   ========================================== */
+   :root {
+    --bg-yellow: #fff59d;         /* Fondo amarillo suave de la marca */
+    --mess-pink: #c2185b;          /* Magenta/Rosa logo MESS */
+    --mess-blue: #0056b3;          /* Azul de los botones principal */
+    --mess-green: #2e7d32;         /* Verde del popup de éxito */
+    --receipt-bg: #ece6d8;        /* Color beige de ticket/recibo */
+    --text-dark: #212121;
+    --border-radius-card: 16px;
+    --font-title: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+    --font-receipt: 'Courier New', Courier, monospace;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    background-color: var(--bg-yellow);
+    color: var(--text-dark);
+    font-family: var(--font-title);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* ==========================================
+     1. LANDING PAGE (Inicio con scroll)
+     ========================================== */
+  .landing-section {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    /* Imagen de fondo de la ciudad coloreada */
+    background-image: url('ciudad.png');
+    background-position: center bottom;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  
+  .landing-header {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .landing-logo {
+    max-width: 260px;
+    height: auto;
+  }
+  
+  .scroll-indicator {
+    margin-bottom: 20px;
+    cursor: pointer;
+    animation: bounce 1.8s infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+  }
+  
+  /* ==========================================
+     2. MENÚ Y LISTA DE COOKIES
+     ========================================== */
+  .menu-section {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .menu-header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+  
+  .cart-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: var(--mess-pink);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .cookies-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  
+  .cookie-card {
+    background-color: var(--receipt-bg);
+    border: 2px solid #000;
+    border-radius: var(--border-radius-card);
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 4px 0px #000;
+  }
+  
+  .cookie-card-body {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .cookie-img-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #ccc;
+    flex-shrink: 0;
+  }
+  
+  .btn-add-cart {
+    background-color: var(--mess-blue);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
+    box-shadow: 2px 2px 0px #000;
+    transition: transform 0.1s ease;
+  }
+  
+  .btn-add-cart:active {
+    transform: scale(0.96);
+  }
+  
+  /* ==========================================
+     3. ESTILO TICKET / RECIBO (Carrito & Datos)
+     ========================================== */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  
+  .receipt-container {
+    background-color: var(--receipt-bg);
+    width: 90%;
+    max-width: 380px;
+    border: 2px solid #000;
+    padding: 25px 20px;
+    font-family: var(--font-receipt);
+    box-shadow: 6px 6px 0px #000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .receipt-header {
+    text-align: center;
+    border-bottom: 2px dashed #666;
+    padding-bottom: 10px;
+  }
+  
+  .receipt-items {
+    border-bottom: 2px dashed #666;
+    padding-bottom: 15px;
+  }
+  
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .btn-primary {
+    background-color: var(--mess-blue);
+    color: white;
+    border: 1px solid #000;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  /* Formulario dentro del ticket */
+  .receipt-form input, 
+  .receipt-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #777;
+    border-radius: 6px;
+    font-family: var(--font-receipt);
+  }
+  
+  /* ==========================================
+     4. POPUPS (Rosa y Verde)
+     ========================================== */
+  .popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 320px;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #000;
+    color: white;
+    text-align: center;
+    box-shadow: 4px 4px 0px #000;
+    z-index: 150;
+  }
+  
+  .popup-error-pink {
+    background-color: var(--mess-pink);
+  }
+  
+  .popup-success-green {
+    background-color: var(--mess-green);
+  }
+  
+  .btn-popup-close {
+    background-color: var(--mess-pink);
+    color: white;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    padding: 6px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .popup-success-green .btn-popup-close {
+    background-color: white;
+    color: var(--mess-green);
+    border: none;
+  }
+  
+  /* ==========================================
+     5. PANTALLAS DE ADMIN
+     ========================================== */
+  .admin-login-screen {
+    background-color: var(--bg-yellow);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .admin-doors {
+    background: url('incial admin-2.png') no-repeat center;
+    background-size: cover;
+    width: 300px;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #000;
+  }
+  
+  .admin-dashboard {
+    background: url('incial admin.png') no-repeat center;
+    background-size: cover;
+    width: 100%;
+    max-width: 450px;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  /* ==========================================
+     6. RESPONSIVO (Escritorios / Compus)
+     ========================================== */
+  @media (min-width: 768px) {
+    .menu-section {
+      max-width: 750px;
+    }
+    
+    .cookies-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .receipt-container {
+      max-width: 440px;
+    }
+  }
