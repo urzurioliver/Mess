@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
     `).join('');
 });
-
+function confirmarCarrito() {
+    if (carrito.length === 0) {
+      document.getElementById('popup-rosa-error').style.display = 'block';
+    } else {
+      abrirFormularioDatos();
+    }
+  }
 function actualizarCarrito(id, cantidad) {
     const qty = parseInt(cantidad) || 0;
     if (qty > 0) {
