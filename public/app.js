@@ -1,5 +1,34 @@
 let carrito = [];
-
+// Arreglo con tus cookies por defecto
+const listaDeCookies = [
+    { id: 1, nombre: "Cookie Clásica", descripcion: "Descripción breve de la cookie, qué tiene y esas boludeces quick.", precio: 25000 },
+    { id: 2, nombre: "Cookie Comicilo", descripcion: "Descripción breve de la cookie, qué tiene y esas boludeces quick.", precio: 25000 },
+    { id: 3, nombre: "Cookie Mess Special", descripcion: "Descripción breve de la cookie, qué tiene y esas boludeces quick.", precio: 25000 }
+  ];
+  
+  // Función para renderizar automáticamente las cookies al abrir la página
+  function cargarMenu() {
+    const contenedor = document.querySelector('.cookies-grid');
+    if (!contenedor) return;
+  
+    contenedor.innerHTML = '';
+    listaDeCookies.forEach(cookie => {
+      contenedor.innerHTML += `
+        <div class="cookie-card">
+          <div class="cookie-img-circle"></div>
+          <div class="cookie-info">
+            <h3>${cookie.nombre}</h3>
+            <p>${cookie.descripcion}</p>
+            <span class="price">$${cookie.precio}</span>
+          </div>
+          <button class="btn-add" onclick="agregarCookie('${cookie.nombre}', ${cookie.precio})">Agregar al carrito</button>
+        </div>
+      `;
+    });
+  }
+  
+  // Llama a la función apenas carga el documento
+  document.addEventListener('DOMContentLoaded', cargarMenu);
 function agregarCookie(nombre, precio) {
   carrito.push({ nombre, precio });
   document.getElementById('cart-count').innerText = carrito.length;
