@@ -1,97 +1,81 @@
-let cookiesDisponibles = [];
-const carrito = {};
+let carrito = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const res = await fetch('/api/cookies');
-    cookiesDisponibles = await res.json();
-    
-    const container = document.getElementById('menu-cookies');
-    container.innerHTML = cookiesDisponibles.map(c => `
-        <div>
-            <strong>${c.nombre}</strong> - $${c.precio}
-            <input type="number" min="0" value="0" id="cookie-${c.id}" onchange="actualizarCarrito(${c.id}, this.value)">
-        </div>
-    `).join('');
-});
-function confirmarCarrito() {
-    if (carrito.length === 0) {
-      document.getElementById('popup-rosa-error').style.display = 'block';
-    } else {
-      abrirFormularioDatos();
-    }
+function agregarCookie(nombre, precio) {
+  carrito.push({ nombre, precio });
+  document.getElementById('cart-count').innerText = carrito.length;
+}
+
+function abrirCarrito() {
+  const lista = document.getElementById('cart-items-list');
+  lista.innerHTML = '';
+  let total = 0;
+
+  carrito.forEach(item => {
+    total += item.precio;
+    lista.innerHTML += `<div style="display:flex; justify-content:space-between;">
+      <span>${item.nombre}</span>
+      <span>$${item.precio}</span>
+    </div>`;
+  });
+
+  document.getElementById('cart-total-amount').innerText = total;
+  document.getElementById('cart-modal').style.display = 'flex';
+}
+
+function cerrarCarrito() {
+  document.getElementById('cart-modal').style.display = 'none';
+}
+
+function confirmarPedido() {
+  cerrarCarrito();
+  if (carrito.length === 0) {
+    document.getElementById('popup-rosa').style.display = 'flex';
+  } else {
+    document.getElementById('checkout-total').innerText = document.getElementById('cart-total-amount').innerText;
+    document.getElementById('checkout-modal').style.display = 'flex';
   }
-function actualizarCarrito(id, cantidad) {
-    const qty = parseInt(cantidad) || 0;
-    if (qty > 0) {
-        carrito[id] = qty;
-    } else {
-        delete carrito[id];
-    }
-    calcularTotal();
 }
 
-function calcularTotal() {
-    let total = 0;
-    for (const id in carrito) {
-        const item = cookiesDisponibles.find(c => c.id == id);
-        if (item) total += item.precio * carrito[id];
-    }
-    document.getElementById('totalText').textContent = total;
-    return total;
+function evaluarEntrega() {
+  const valor = document.getElementById('tipo-entrega').value;
+  document.getElementById('campo-direccion').style.display = (valor === 'domicilio') ? 'block' : 'none';
 }
 
-function toggleComprobante(metodo) {
-    document.getElementById('comprobanteContainer').style.display = metodo === 'mercadopago' ? 'block' : 'none';
+function evaluarPago() {
+  const valor = document.getElementById('medio-pago').value;
+  document.getElementById('campo-comprobante').style.display = (valor === 'mercadopago') ? 'block' : 'none';
 }
 
-document.getElementById('orderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+function finalizarCompra() {
+  document.getElementById('checkout-modal').style.display = 'none';
+  document.getElementById('popup-verde').style.display = 'flex';
+}
 
-    const total = calcularTotal();
-    if (total <= 0) {
-        alert("Por favor selecciona al menos una cookie.");
-        return;
-    }
+function cerrarPopup(id) {
+  document.getElementById(id).style.display = 'none';
+}
 
-    const items = [];
-    for (const id in carrito) {
-        const item = cookiesDisponibles.find(c => c.id == id);
-        items.push({
-            cookie_id: parseInt(id),
-            cookie: item.nombre,
-            cantidad: carrito[id],
-            precio_unitario: item.precio
-        });
-    }
+function reiniciarTodo() {
+  carrito = [];
+  document.getElementById('cart-count').innerText = 0;
+  cerrarPopup('popup-verde');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    const formData = new FormData();
-    formData.append('nombre', document.getElementById('nombreApellido').value);
-    formData.append('curso', document.getElementById('curso').value);
-    formData.append('metodo_entrega', document.getElementById('metodoEntrega').value);
-    formData.append('metodo_pago', document.getElementById('metodoPago').value);
-    formData.append('total', total);
-    formData.append('items', JSON.stringify(items));
+function irAAdmin() {
+  document.getElementById('admin-screen').style.display = 'flex';
+}
 
-    if (document.getElementById('metodoPago').value === 'mercadopago') {
-        const fileInput = document.getElementById('comprobante');
-        if (fileInput.files.length === 0) {
-            alert("Debes adjuntar el comprobante para pagos por Mercado Pago.");
-            return;
-        }
-        formData.append('comprobante', fileInput.files[0]);
-    }
+function cerrarAdmin() {
+  document.getElementById('admin-screen').style.display = 'none';
+}
 
-    const res = await fetch('/api/pedidos', {
-        method: 'POST',
-        body: formData
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-        alert(`¡Pedido realizado con éxito! ID: ${data.pedido_id}\nDetalle IA: ${data.ia_detalle}`);
-        window.location.reload();
-    } else {
-        alert(`Error: ${data.error}`);
-    }
-});
-// hey
+function loginAdmin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === 'admin123') { // Cambia la clave según requieras
+    document.getElementById('admin-login-box').style.display = 'none';
+    document.getElementById('admin-panel-box').style.display = 'block';
+  } else {
+    alert('Contraseña incorrecta');
+  }
+}

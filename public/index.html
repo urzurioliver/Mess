@@ -1,71 +1,170 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MESS Cookies</title>
-        
-        <!-- Enlace a tu archivo CSS -->
-        <link rel="stylesheet" href="/styles.css">
-      </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESS Cookies</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
 <body>
-    <h1>MESS - Compra de Cookies</h1>
 
-    <section>
-        <h2>Menú</h2>
-        <div id="menu-cookies">Cargando menú...</div>
-    </section>
+  <!-- 1. LANDING PAGE -->
+  <section id="landing-screen" class="landing-container">
+    <div class="landing-content">
+      <p class="subtitle-top">MAKE 'EM</p> <!--[cite: 5] -->
+      <img src="mess-logo.png" alt="MESS Logo" class="landing-logo"> <!--[cite: 2] -->
+      <p class="subtitle-bottom">ier</p> <!--[cite: 5] -->
+    </div>
+    <!-- Imagen de la ciudad abajo -->
+    <div class="city-illustration"></div>
+    <!-- Flecha para scrollear -->
+    <a href="#menu-screen" class="scroll-arrow">↓</a>
+  </section>
 
-    <hr>
+  <!-- 2. MENÚ DE COOKIES -->
+  <section id="menu-screen" class="menu-container">
+    <header class="menu-header">
+      <div class="header-titles">
+        <img src="mess-logo.png" alt="MESS" class="menu-logo"> <!--[cite: 2, 7] -->
+        <h2>NUESTRO MENÚ</h2> <!-- -->
+      </div>
+      <!-- Bolsa de compras en la esquina superior -->
+      <button id="cart-icon-btn" class="cart-btn" onclick="abrirCarrito()">
+        🛍️ <span id="cart-count" class="cart-badge">0</span>
+      </button>
+    </header>
 
-    <section>
-        <h2>Realizar Pedido</h2>
-        <form id="orderForm" enctype="multipart/form-data">
-            <div>
-                <label>Nombre y Apellido:</label><br>
-                <input type="text" id="nombreApellido" required placeholder="Ej: Maria Perez">
-            </div><br>
+    <div class="cookies-grid">
+      <!-- Cookie 1 -->
+      <div class="cookie-card">
+        <div class="cookie-img-circle"></div>
+        <div class="cookie-info">
+          <h3>NOMBRE</h3> <!--[cite: 7] -->
+          <p>Descripción breve de la cookie, que tiene y esas boludeces quick.</p> <!--[cite: 7] -->
+          <span class="price">$precio</span> <!--[cite: 7] -->
+        </div>
+        <button class="btn-add" onclick="agregarCookie('Clásica', 25000)">Agregar al carrito</button> <!--[cite: 6, 7] -->
+      </div>
+      <!-- Agrega más tarjetas de cookie según necesites -->
+    </div>
 
-            <div>
-                <label>Curso:</label><br>
-                <input type="text" id="curso" required placeholder="Ej: 5º B">
-            </div><br>
+    <!-- Acceso discreto a la sección de Admin abajo -->
+    <button class="btn-admin-access" onclick="irAAdmin()">Panel Admin</button>
+  </section>
 
-            <div>
-                <label>¿Cómo recibes el pedido?:</label><br>
-                <select id="metodoEntrega" required>
-                    <option value="colegio">En el colegio</option>
-                    <option value="afuera">Afuera del colegio</option>
-                </select>
-            </div><br>
+  <!-- 3. VENTANA FLOTANTE: RECIBO / CARRITO (Tiquet) -->
+  <div id="cart-modal" class="modal-overlay" style="display: none;">
+    <div class="receipt-card">
+      <div class="receipt-header">
+        <img src="mess-logo.png" alt="MESS" class="receipt-logo"> <!--[cite: 2, 4, 6, 9] -->
+        <p class="tagline">MAKE THINGS MESSY AGAIN</p> <!--[cite: 4, 6, 8, 9] -->
+      </div>
+      <div class="receipt-divider">-----------------------------</div>
+      
+      <p class="receipt-section-title">COOKIES</p> <!--[cite: 4] -->
+      <div id="cart-items-list" class="cart-items">
+        <!-- Se llena con JS dinámicamente -->
+      </div>
 
-            <div>
-                <label>Método de Pago:</label><br>
-                <select id="metodoPago" required onchange="toggleComprobante(this.value)">
-                    <option value="efectivo">Efectivo</option>
-                    <option value="mercadopago">Mercado Pago</option>
-                </select>
-            </div><br>
+      <div class="receipt-divider">-----------------------------</div>
+      <div class="receipt-total">
+        <span>A pagar</span> <!--[cite: 4, 6, 9] -->
+        <span id="cart-total-amount">0</span> <!--[cite: 4] -->
+      </div>
 
-            <div id="comprobanteContainer" style="display:none;">
-                <label>Adjuntar Comprobante (Mercado Pago):</label><br>
-                <input type="file" id="comprobante" accept="image/*">
-            </div><br>
+      <button class="btn-action" onclick="confirmarPedido()">Confirmar</button> <!--[cite: 4] -->
+      <button class="btn-close-link" onclick="cerrarCarrito()">Cerrar</button>
+    </div>
+  </div>
 
-            <h3>Total a pagar: $<span id="totalText">0</span></h3>
+  <!-- 4. VENTANA FLOTANTE: FORMULARIO DE DATOS -->
+  <div id="checkout-modal" class="modal-overlay" style="display: none;">
+    <div class="receipt-card">
+      <div class="receipt-header">
+        <img src="mess-logo.png" alt="MESS" class="receipt-logo"> <!--[cite: 2, 4, 6, 9] -->
+        <p class="tagline">MAKE THINGS MESSY AGAIN</p> <!--[cite: 4, 6, 8, 9] -->
+      </div>
+      <div class="receipt-divider">-----------------------------</div>
 
-            <button type="submit">Confirmar y Enviar Pedido</button>
-            <a href="#menu-section" class="scroll-indicator">
-                <!-- Flecha hacia abajo -->
-              </a>
-              <section id="menu-section" class="menu-section"> ... </section>
-              <div id="direccion-extra" style="display: none;">
-                <input type="text" placeholder="Dirección de envío">
-                <input type="text" placeholder="Teléfono / Piso">
-              </div>
-        </form>
-    </section>
+      <form id="checkout-form" class="receipt-form" onsubmit="event.preventDefault(); finalizarCompra();">
+        <input type="text" id="cliente-nombre" placeholder="Nombre y apellido" required> <!--[cite: 6] -->
+        
+        <select id="tipo-entrega" onchange="evaluarEntrega()" required>
+          <option value="">cómo recibís el pedido</option> <!--[cite: 6] -->
+          <option value="colegio">En el colegio</option>
+          <option value="domicilio">Otro lugar / Domicilio</option>
+        </select>
 
-    <script src="app.js"></script>
+        <!-- Bloque condicional si elige fuera del colegio -->
+        <div id="campo-direccion" style="display: none;">
+          <input type="text" placeholder="Dirección de entrega">
+        </div>
+
+        <select id="medio-pago" onchange="evaluarPago()" required>
+          <option value="">Medio de pago</option> <!--[cite: 6] -->
+          <option value="efectivo">Efectivo</option>
+          <option value="mercadopago">Mercado Pago</option>
+        </select>
+
+        <!-- Bloque condicional si elige Mercado Pago -->
+        <div id="campo-comprobante" style="display: none;" class="upload-box">
+          <label for="comprobante">Subir comprobante de pago:</label>
+          <input type="file" id="comprobante" accept="image/*">
+        </div>
+
+        <div class="receipt-divider">-----------------------------</div>
+        <div class="receipt-total">
+          <span>A pagar</span> <!--[cite: 4, 6, 9] -->
+          <span id="checkout-total">25000</span> <!--[cite: 6, 9] -->
+        </div>
+
+        <button type="submit" class="btn-action">Finalizar</button> <!--[cite: 6, 9] -->
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. POPUP ROSA (Sin cookies seleccionadas) -->
+  <div id="popup-rosa" class="modal-overlay" style="display: none;">
+    <div class="popup-box pink-popup">
+      <p class="popup-title">TODAVÍA NO TENÉS COOKIES EN TU CARRITO</p> <!--[cite: 4] -->
+      <p class="popup-sub">Agregá cookies antes de continuar</p> <!--[cite: 4] -->
+      <button class="btn-popup" onclick="cerrarPopup('popup-rosa')">volver</button> <!--[cite: 4] -->
+      <div class="mess-stamp">MESS</div> <!--[cite: 4] -->
+    </div>
+  </div>
+
+  <!-- 6. POPUP VERDE (Pedido/Pago exitoso) -->
+  <div id="popup-verde" class="modal-overlay" style="display: none;">
+    <div class="popup-box green-popup">
+      <p class="popup-title">TU PAGO FUE PROCESADO EXITOSAMENTE.</p> <!--[cite: 9] -->
+      <p class="popup-sub">Gracias por tu compra.</p> <!--[cite: 9] -->
+      <button class="btn-popup" onclick="reiniciarTodo()">Volver</button> <!--[cite: 9] -->
+      <div class="mess-stamp">MESS</div> <!--[cite: 9] -->
+    </div>
+  </div>
+
+  <!-- 7. PANTALLA PÚBLICA DE ADMIN (Login & Panel) -->
+  <section id="admin-screen" class="admin-container" style="display: none;">
+    <div class="admin-doors-box">
+      <div class="admin-header">
+        <img src="mess-logo.png" alt="MESS" class="admin-logo"> <!--[cite: 2, 3] -->
+        <span class="admin-badge">ADMIN</span> <!-- -->
+      </div>
+      
+      <div id="admin-login-box" class="admin-card">
+        <input type="password" id="admin-pass" placeholder="Contraseña"> <!--[cite: 3] -->
+        <button class="btn-action" onclick="loginAdmin()">Ingresar</button>
+      </div>
+
+      <!-- Panel Admin (Post-login) -->
+      <div id="admin-panel-box" class="admin-panel" style="display: none;">
+        <h3>PANEL DE CONTROL</h3>
+        <p>Aquí gestionas los pedidos recibidos.</p>
+        <button class="btn-close-link" onclick="cerrarAdmin()">Cerrar Admin</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
 </body>
 </html>

@@ -1,334 +1,374 @@
-/* ==========================================
-   VARIABLES Y ESTILOS GLOBALES
-   ========================================== */
-   :root {
-    --bg-yellow: #fff59d;         /* Fondo amarillo suave de la marca */
-    --mess-pink: #c2185b;          /* Magenta/Rosa logo MESS */
-    --mess-blue: #0056b3;          /* Azul de los botones principal */
-    --mess-green: #2e7d32;         /* Verde del popup de éxito */
-    --receipt-bg: #ece6d8;        /* Color beige de ticket/recibo */
-    --text-dark: #212121;
-    --border-radius-card: 16px;
-    --font-title: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
-    --font-receipt: 'Courier New', Courier, monospace;
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    background-color: var(--bg-yellow);
-    color: var(--text-dark);
-    font-family: var(--font-title);
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* ==========================================
-     1. LANDING PAGE (Inicio con scroll)
-     ========================================== */
-  .landing-section {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 0;
-    /* Imagen de fondo de la ciudad coloreada */
-    background-image: url('ciudad.png');
-    background-position: center bottom;
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-  
-  .landing-header {
-    margin-top: 10px;
-    text-align: center;
-  }
-  
-  .landing-logo {
-    max-width: 260px;
-    height: auto;
-  }
-  
-  .scroll-indicator {
-    margin-bottom: 20px;
-    cursor: pointer;
-    animation: bounce 1.8s infinite;
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
-  }
-  
-  /* ==========================================
-     2. MENÚ Y LISTA DE COOKIES
-     ========================================== */
-  .menu-section {
-    width: 100%;
-    max-width: 480px;
-    min-height: 100vh;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .menu-header {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 25px;
-  }
-  
-  .cart-icon-btn {
-    position: absolute;
-    right: 10px;
-    top: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .cart-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background-color: var(--mess-pink);
-    color: white;
-    border-radius: 50%;
-    padding: 2px 7px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-  
-  .cookies-grid {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-  }
-  
-  .cookie-card {
-    background-color: var(--receipt-bg);
-    border: 2px solid #000;
-    border-radius: var(--border-radius-card);
-    padding: 20px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 4px 4px 0px #000;
-  }
-  
-  .cookie-card-body {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-  
-  .cookie-img-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: #ccc;
-    flex-shrink: 0;
-  }
-  
-  .btn-add-cart {
-    background-color: var(--mess-blue);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-    align-self: center;
-    box-shadow: 2px 2px 0px #000;
-    transition: transform 0.1s ease;
-  }
-  
-  .btn-add-cart:active {
-    transform: scale(0.96);
-  }
-  
-  /* ==========================================
-     3. ESTILO TICKET / RECIBO (Carrito & Datos)
-     ========================================== */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-  }
-  
-  .receipt-container {
-    background-color: var(--receipt-bg);
-    width: 90%;
-    max-width: 380px;
-    border: 2px solid #000;
-    padding: 25px 20px;
-    font-family: var(--font-receipt);
-    box-shadow: 6px 6px 0px #000;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .receipt-header {
-    text-align: center;
-    border-bottom: 2px dashed #666;
-    padding-bottom: 10px;
-  }
-  
-  .receipt-items {
-    border-bottom: 2px dashed #666;
-    padding-bottom: 15px;
-  }
-  
-  .receipt-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  
-  .receipt-total {
-    display: flex;
-    justify-content: space-between;
-    font-size: 20px;
-    font-weight: bold;
-  }
-  
-  .btn-primary {
-    background-color: var(--mess-blue);
-    color: white;
-    border: 1px solid #000;
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  /* Formulario dentro del ticket */
-  .receipt-form input, 
-  .receipt-form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #777;
-    border-radius: 6px;
-    font-family: var(--font-receipt);
-  }
-  
-  /* ==========================================
-     4. POPUPS (Rosa y Verde)
-     ========================================== */
-  .popup {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    max-width: 320px;
-    padding: 20px;
-    border-radius: 16px;
-    border: 2px solid #000;
-    color: white;
-    text-align: center;
-    box-shadow: 4px 4px 0px #000;
-    z-index: 150;
-  }
-  
-  .popup-error-pink {
-    background-color: var(--mess-pink);
-  }
-  
-  .popup-success-green {
-    background-color: var(--mess-green);
-  }
-  
-  .btn-popup-close {
-    background-color: var(--mess-pink);
-    color: white;
-    border: 2px solid #fff;
-    border-radius: 20px;
-    padding: 6px 20px;
-    margin-top: 15px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .popup-success-green .btn-popup-close {
-    background-color: white;
-    color: var(--mess-green);
-    border: none;
-  }
-  
-  /* ==========================================
-     5. PANTALLAS DE ADMIN
-     ========================================== */
-  .admin-login-screen {
-    background-color: var(--bg-yellow);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .admin-doors {
-    background: url('incial admin-2.png') no-repeat center;
-    background-size: cover;
-    width: 300px;
-    height: 350px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid #000;
-  }
-  
-  .admin-dashboard {
-    background: url('incial admin.png') no-repeat center;
-    background-size: cover;
-    width: 100%;
-    max-width: 450px;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  
-  /* ==========================================
-     6. RESPONSIVO (Escritorios / Compus)
-     ========================================== */
-  @media (min-width: 768px) {
-    .menu-section {
-      max-width: 750px;
-    }
-    
-    .cookies-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-    }
-  
-    .receipt-container {
-      max-width: 440px;
-    }
-  }
+:root {
+  --bg-yellow: #fded96;
+  --mess-pink: #ca1466;
+  --mess-green: #1d7140;
+  --mess-blue: #0252cf;
+  --receipt-bg: #eae3d2;
+  --text-dark: #1a1a1a;
+  --font-main: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+  --font-receipt: 'Courier New', Courier, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-yellow);
+  font-family: var(--font-main);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* 1. LANDING SCREEN */
+.landing-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  padding: 40px 0 20px 0;
+}
+
+.landing-content .subtitle-top {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.landing-logo {
+  width: 280px;
+  max-width: 80%;
+  margin: 10px 0;
+}
+
+.landing-content .subtitle-bottom {
+  font-size: 2rem;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+}
+
+.city-illustration {
+  width: 100%;
+  height: 55vh;
+  background: url('ciudad.png') no-repeat center bottom;
+  background-size: contain;
+}
+
+.scroll-arrow {
+  text-decoration: none;
+  font-size: 2rem;
+  color: #fff;
+  background-color: rgba(0,0,0,0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+/* 2. MENU SCREEN */
+.menu-container {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.menu-logo {
+  width: 180px;
+}
+
+.cart-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 90;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--mess-pink);
+  color: white;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.cookies-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cookie-card {
+  background-color: var(--receipt-bg);
+  border: 2px solid #000;
+  border-radius: 16px;
+  padding: 15px;
+  position: relative;
+  box-shadow: 4px 4px 0px #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cookie-img-circle {
+  width: 80px;
+  height: 80px;
+  background: #ccc;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.cookie-info {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.btn-add {
+  background-color: var(--mess-blue);
+  color: white;
+  border: 1px solid #000;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.btn-admin-access {
+  margin-top: 50px;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+/* 3. MODALES & RECIBOS */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.receipt-card {
+  background-color: var(--receipt-bg);
+  border: 2px solid #000;
+  padding: 25px;
+  width: 90%;
+  max-width: 360px;
+  font-family: var(--font-receipt);
+  box-shadow: 6px 6px 0px #000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.receipt-header {
+  text-align: center;
+}
+
+.receipt-logo {
+  width: 140px;
+}
+
+.tagline {
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.receipt-divider {
+  text-align: center;
+  color: #777;
+  overflow: hidden;
+}
+
+.receipt-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.btn-action {
+  background-color: var(--mess-blue);
+  color: white;
+  border: 1px solid #000;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.btn-close-link {
+  background: none;
+  border: none;
+  color: #555;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.receipt-form input,
+.receipt-form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #666;
+  font-family: var(--font-receipt);
+}
+
+/* 4. POPUPS (Rosa y Verde) */
+.popup-box {
+  width: 85%;
+  max-width: 320px;
+  padding: 25px 20px;
+  border-radius: 20px;
+  border: 2px solid #000;
+  color: white;
+  text-align: center;
+  position: relative;
+  box-shadow: 5px 5px 0px #000;
+}
+
+.pink-popup {
+  background-color: var(--mess-pink);
+}
+
+.green-popup {
+  background-color: var(--mess-green);
+}
+
+.popup-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.btn-popup {
+  background-color: var(--mess-pink);
+  border: 2px solid #fff;
+  color: white;
+  padding: 8px 25px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.green-popup .btn-popup {
+  background-color: white;
+  color: var(--mess-green);
+}
+
+.mess-stamp {
+  position: absolute;
+  bottom: -15px;
+  right: -10px;
+  background: var(--bg-yellow);
+  color: var(--mess-pink);
+  border: 2px solid var(--mess-pink);
+  padding: 3px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transform: rotate(-10deg);
+}
+
+/* 5. SECCIÓN DE ADMIN */
+.admin-container {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: var(--bg-yellow);
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-doors-box {
+  background: url('incial admin-2.png') no-repeat center;
+  background-size: cover;
+  width: 320px;
+  height: 420px;
+  border: 2px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 20px;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.admin-header {
+  text-align: center;
+}
+
+.admin-logo {
+  width: 150px;
+}
+
+.admin-badge {
+  background: var(--bg-yellow);
+  border: 1px solid #000;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  display: inline-block;
+  transform: rotate(-5deg);
+}
+
+.admin-card input {
+  padding: 10px;
+  border: 1px solid #000;
+  text-align: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
